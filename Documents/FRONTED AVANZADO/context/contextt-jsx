@@ -1,0 +1,44 @@
+import { createContext, useState, useEffect } from 'react'
+import jwt_decode from 'jwt-decode'
+
+export const impContext = createContext()
+
+export function AuthProvider (props) {
+  const [isLog, setIsAuth] = useState(false)
+  const [user, setUser] = useState(null)
+
+  const introUser = (token) => {
+    window.localStorage.setItem('token', token)
+    const coden = jwt_decode(token)
+    setUser(coden)
+    setIsAuth(true)
+  }
+
+  const logout = () => {
+    window.localStorage.removeItem('token')
+    setIsAuth(false)
+    setUser(null)
+  }
+
+  useEffect(() => {
+    const token = window.localStorage.getItem('token')
+    if (token) {
+      const coden = jwt_decode(token)
+      setUser(coden)
+      setIsAuth(true)
+    }
+  }, [])
+
+  const values = {
+    isLog,
+    user,
+    introUser,
+    logout
+  }
+
+  return (
+    <impContext.Provider value={values}>
+      {props.children}
+    </impContext.Provider>
+  )
+}
